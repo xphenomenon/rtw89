@@ -398,7 +398,7 @@ static void rtw89_station_mode_sta_assoc(struct rtw89_dev *rtwdev,
 static void rtw89_ops_bss_info_changed(struct ieee80211_hw *hw,
 				       struct ieee80211_vif *vif,
 				       struct ieee80211_bss_conf *conf,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 				       u64 changed)
 #else
 				       u32 changed)
@@ -411,7 +411,7 @@ static void rtw89_ops_bss_info_changed(struct ieee80211_hw *hw,
 	rtw89_leave_ps_mode(rtwdev);
 
 	if (changed & BSS_CHANGED_ASSOC) {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 		if (vif->cfg.assoc) {
 #else
 		if (conf->assoc) {
@@ -460,7 +460,7 @@ static void rtw89_ops_bss_info_changed(struct ieee80211_hw *hw,
 	mutex_unlock(&rtwdev->mutex);
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 static int rtw89_ops_start_ap(struct ieee80211_hw *hw,
 			      struct ieee80211_vif *vif,
 			      struct ieee80211_bss_conf *link_conf)
@@ -493,7 +493,7 @@ static int rtw89_ops_start_ap(struct ieee80211_hw *hw, struct ieee80211_vif *vif
 	return 0;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 static
 void rtw89_ops_stop_ap(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		       struct ieee80211_bss_conf *link_conf)
@@ -524,7 +524,7 @@ static int rtw89_ops_set_tim(struct ieee80211_hw *hw, struct ieee80211_sta *sta,
 	return 0;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 static int rtw89_ops_conf_tx(struct ieee80211_hw *hw,
 			     struct ieee80211_vif *vif,
 			     unsigned int link_id, u16 ac,
@@ -942,7 +942,7 @@ static void rtw89_ops_change_chanctx(struct ieee80211_hw *hw,
 
 static int rtw89_ops_assign_vif_chanctx(struct ieee80211_hw *hw,
 					struct ieee80211_vif *vif,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0) || defined(BUILD_OPENWRT)
 					struct ieee80211_bss_conf *link_conf,
 #endif
 					struct ieee80211_chanctx_conf *ctx)
@@ -960,7 +960,7 @@ static int rtw89_ops_assign_vif_chanctx(struct ieee80211_hw *hw,
 
 static void rtw89_ops_unassign_vif_chanctx(struct ieee80211_hw *hw,
 					   struct ieee80211_vif *vif,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0) || defined(BUILD_OPENWRT)
 					   struct ieee80211_bss_conf *link_conf,
 #endif
 					   struct ieee80211_chanctx_conf *ctx)

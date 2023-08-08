@@ -951,14 +951,14 @@ static int rtw89_fw_h2c_add_general_pkt(struct rtw89_dev *rtwdev,
 		skb = ieee80211_proberesp_get(rtwdev->hw, vif);
 		break;
 	case RTW89_PKT_OFLD_TYPE_NULL_DATA:
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0) && !defined(BUILD_OPENWRT)
 		skb = ieee80211_nullfunc_get(rtwdev->hw, vif, false);
 #else
 		skb = ieee80211_nullfunc_get(rtwdev->hw, vif, -1, false);
 #endif
 		break;
 	case RTW89_PKT_OFLD_TYPE_QOS_NULL:
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0) && !defined(BUILD_OPENWRT)
 		skb = ieee80211_nullfunc_get(rtwdev->hw, vif, true);
 #else
 		skb = ieee80211_nullfunc_get(rtwdev->hw, vif, -1, true);
@@ -1232,7 +1232,7 @@ static void __get_sta_he_pkt_padding(struct rtw89_dev *rtwdev,
 {
 	bool ppe_th;
 	u8 ppe16, ppe8;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0) && !defined(BUILD_OPENWRT)
 	u8 nss = min(sta->rx_nss, rtwdev->hal.tx_nss) - 1;
 	u8 ppe_thres_hdr = sta->he_cap.ppe_thres[0];
 #else
@@ -1244,7 +1244,7 @@ static void __get_sta_he_pkt_padding(struct rtw89_dev *rtwdev,
 	u16 ppe;
 	int i;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0) && !defined(BUILD_OPENWRT)
 	if (!sta->he_cap.has_he)
 		return;
 
@@ -1265,7 +1265,7 @@ static void __get_sta_he_pkt_padding(struct rtw89_dev *rtwdev,
 #else
 		pad = FIELD_GET(IEEE80211_HE_PHY_CAP9_NOMINAL_PKT_PADDING_MASK,
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0) && !defined(BUILD_OPENWRT)
 				sta->he_cap.he_cap_elem.phy_cap_info[9]);
 #else
 				sta->deflink.he_cap.he_cap_elem.phy_cap_info[9]);
@@ -1291,7 +1291,7 @@ static void __get_sta_he_pkt_padding(struct rtw89_dev *rtwdev,
 		sh = n & 7;
 		n += IEEE80211_PPE_THRES_INFO_PPET_SIZE * 2;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0) && !defined(BUILD_OPENWRT)
 		ppe = le16_to_cpu(*((__le16 *)&sta->he_cap.ppe_thres[idx]));
 #else
 		ppe = le16_to_cpu(*((__le16 *)&sta->deflink.he_cap.ppe_thres[idx]));
@@ -1364,7 +1364,7 @@ int rtw89_fw_h2c_assoc_cmac_tbl(struct rtw89_dev *rtwdev,
 		SET_CMC_TBL_NOMINAL_PKT_PADDING160(skb->data, pads[RTW89_CHANNEL_WIDTH_160]);
 	}
 	if (sta)
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,19,0) || defined(BUILD_OPENWRT)
 		SET_CMC_TBL_BSR_QUEUE_SIZE_FORMAT(skb->data,
 						  sta->deflink.he_cap.has_he);
 #else
@@ -1492,7 +1492,7 @@ int rtw89_fw_h2c_update_beacon(struct rtw89_dev *rtwdev,
 	else
 		beacon_rate = RTW89_HW_RATE_OFDM6;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 	skb_beacon = ieee80211_beacon_get_tim(rtwdev->hw, vif, &tim_offset,
 					      NULL, 0);
 #else

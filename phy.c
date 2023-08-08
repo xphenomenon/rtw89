@@ -69,14 +69,14 @@ static u64 get_mcs_ra_mask(u16 mcs_map, u8 highest_mcs, u8 gap)
 
 static u64 get_he_ra_mask(struct ieee80211_sta *sta)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	struct ieee80211_sta_he_cap cap = sta->he_cap;
 #else
 	struct ieee80211_sta_he_cap cap = sta->deflink.he_cap;
 #endif
 	u16 mcs_map;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	switch (sta->bandwidth) {
 #else
 	switch (sta->deflink.bandwidth) {
@@ -175,7 +175,7 @@ static u64 rtw89_phy_ra_mask_cfg(struct rtw89_dev *rtwdev, struct rtw89_sta *rtw
 		return -1;
 	}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	if (sta->he_cap.has_he) {
 #else
 	if (sta->deflink.he_cap.has_he) {
@@ -186,7 +186,7 @@ static u64 rtw89_phy_ra_mask_cfg(struct rtw89_dev *rtwdev, struct rtw89_sta *rtw
 		cfg_mask |= u64_encode_bits(mask->control[band].he_mcs[1],
 					    RA_MASK_HE_2SS_RATES);
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	} else if (sta->vht_cap.vht_supported) {
 #else
 	} else if (sta->deflink.vht_cap.vht_supported) {
@@ -195,7 +195,7 @@ static u64 rtw89_phy_ra_mask_cfg(struct rtw89_dev *rtwdev, struct rtw89_sta *rtw
 					    RA_MASK_VHT_1SS_RATES);
 		cfg_mask |= u64_encode_bits(mask->control[band].vht_mcs[1],
 					    RA_MASK_VHT_2SS_RATES);
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	} else if (sta->ht_cap.ht_supported) {
 #else
 	} else if (sta->deflink.ht_cap.ht_supported) {
@@ -280,7 +280,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 
 	memset(ra, 0, sizeof(*ra));
 	/* Set the ra mask from sta's capability */
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	if (sta->he_cap.has_he) {
 #else
 	if (sta->deflink.he_cap.has_he) {
@@ -289,14 +289,14 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		csi_mode = RTW89_RA_RPT_MODE_HE;
 		ra_mask |= get_he_ra_mask(sta);
 		high_rate_masks = rtw89_ra_mask_he_rates;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->he_cap.he_cap_elem.phy_cap_info[2] &
 #else
 		if (sta->deflink.he_cap.he_cap_elem.phy_cap_info[2] &
 #endif
 		    IEEE80211_HE_PHY_CAP2_STBC_RX_UNDER_80MHZ)
 			stbc_en = 1;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->he_cap.he_cap_elem.phy_cap_info[1] &
 #else
 		if (sta->deflink.he_cap.he_cap_elem.phy_cap_info[1] &
@@ -306,7 +306,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
 		rtw89_phy_ra_gi_ltf(rtwdev, rtwsta, &fix_giltf_en, &fix_giltf);
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	} else if (sta->vht_cap.vht_supported) {
 		u16 mcs_map = le16_to_cpu(sta->vht_cap.vht_mcs.rx_mcs_map);
 #else
@@ -319,26 +319,26 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		/* MCS9, MCS8, MCS7 */
 		ra_mask |= get_mcs_ra_mask(mcs_map, 9, 1);
 		high_rate_masks = rtw89_ra_mask_vht_rates;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->vht_cap.cap & IEEE80211_VHT_CAP_RXSTBC_MASK)
 #else
 		if (sta->deflink.vht_cap.cap & IEEE80211_VHT_CAP_RXSTBC_MASK)
 #endif
 			stbc_en = 1;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->vht_cap.cap & IEEE80211_VHT_CAP_RXLDPC)
 #else
 		if (sta->deflink.vht_cap.cap & IEEE80211_VHT_CAP_RXLDPC)
 #endif
 			ldpc_en = 1;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	} else if (sta->ht_cap.ht_supported) {
 #else
 	} else if (sta->deflink.ht_cap.ht_supported) {
 #endif
 		mode |= RTW89_RA_MODE_HT;
 		csi_mode = RTW89_RA_RPT_MODE_HT;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		ra_mask |= ((u64)sta->ht_cap.mcs.rx_mask[3] << 48) |
 			   ((u64)sta->ht_cap.mcs.rx_mask[2] << 36) |
 			   (sta->ht_cap.mcs.rx_mask[1] << 24) |
@@ -350,13 +350,13 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 			   (sta->deflink.ht_cap.mcs.rx_mask[0] << 12);
 #endif
 		high_rate_masks = rtw89_ra_mask_ht_rates;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->ht_cap.cap & IEEE80211_HT_CAP_RX_STBC)
 #else
 		if (sta->deflink.ht_cap.cap & IEEE80211_HT_CAP_RX_STBC)
 #endif
 			stbc_en = 1;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->ht_cap.cap & IEEE80211_HT_CAP_LDPC_CODING)
 #else
 		if (sta->deflink.ht_cap.cap & IEEE80211_HT_CAP_LDPC_CODING)
@@ -366,7 +366,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 
 	switch (chan->band_type) {
 	case RTW89_BAND_2G:
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		ra_mask |= sta->supp_rates[NL80211_BAND_2GHZ];
 		if (sta->supp_rates[NL80211_BAND_2GHZ] & 0xf)
 #else
@@ -374,7 +374,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		if (sta->deflink.supp_rates[NL80211_BAND_2GHZ] & 0xf)
 #endif
 			mode |= RTW89_RA_MODE_CCK;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		if (sta->supp_rates[NL80211_BAND_2GHZ] & 0xff0)
 #else
 		if (sta->deflink.supp_rates[NL80211_BAND_2GHZ] & 0xff0)
@@ -382,7 +382,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 			mode |= RTW89_RA_MODE_OFDM;
 		break;
 	case RTW89_BAND_5G:
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		ra_mask |= (u64)sta->supp_rates[NL80211_BAND_5GHZ] << 4;
 #else
 		ra_mask |= (u64)sta->deflink.supp_rates[NL80211_BAND_5GHZ] << 4;
@@ -391,7 +391,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		break;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
 	case RTW89_BAND_6G:
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		ra_mask |= (u64)sta->supp_rates[NL80211_BAND_6GHZ] << 4;
 #else
 		ra_mask |= (u64)sta->deflink.supp_rates[NL80211_BAND_6GHZ] << 4;
@@ -425,14 +425,14 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 	ra_mask = rtw89_phy_ra_mask_recover(ra_mask, ra_mask_bak);
 	ra_mask &= rtw89_phy_ra_mask_cfg(rtwdev, rtwsta);
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	switch (sta->bandwidth) {
 #else
 	switch (sta->deflink.bandwidth) {
 #endif
 	case IEEE80211_STA_RX_BW_160:
 		bw_mode = RTW89_CHANNEL_WIDTH_160;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		sgi = sta->vht_cap.vht_supported &&
 		      (sta->vht_cap.cap & IEEE80211_VHT_CAP_SHORT_GI_160);
 #else
@@ -442,7 +442,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		break;
 	case IEEE80211_STA_RX_BW_80:
 		bw_mode = RTW89_CHANNEL_WIDTH_80;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		sgi = sta->vht_cap.vht_supported &&
 		      (sta->vht_cap.cap & IEEE80211_VHT_CAP_SHORT_GI_80);
 #else
@@ -452,7 +452,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		break;
 	case IEEE80211_STA_RX_BW_40:
 		bw_mode = RTW89_CHANNEL_WIDTH_40;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		sgi = sta->ht_cap.ht_supported &&
 		      (sta->ht_cap.cap & IEEE80211_HT_CAP_SGI_40);
 #else
@@ -462,7 +462,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		break;
 	default:
 		bw_mode = RTW89_CHANNEL_WIDTH_20;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 		sgi = sta->ht_cap.ht_supported &&
 		      (sta->ht_cap.cap & IEEE80211_HT_CAP_SGI_20);
 #else
@@ -472,7 +472,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 		break;
 	}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	if (sta->he_cap.he_cap_elem.phy_cap_info[3] &
 	    IEEE80211_HE_PHY_CAP3_DCM_MAX_CONST_RX_16_QAM)
 #else
@@ -493,7 +493,7 @@ static void rtw89_phy_ra_sta_update(struct rtw89_dev *rtwdev,
 	ra->macid = rtwsta->mac_id;
 	ra->stbc_cap = stbc_en;
 	ra->ldpc_cap = ldpc_en;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 19, 0) && !defined(BUILD_OPENWRT)
 	ra->ss_num = min(sta->rx_nss, rtwdev->hal.tx_nss) - 1;
 #else
 	ra->ss_num = min(sta->deflink.rx_nss, rtwdev->hal.tx_nss) - 1;
@@ -2441,7 +2441,7 @@ static void rtw89_phy_c2h_ra_rpt_iter(void *data, struct ieee80211_sta *sta)
 	ra_report->hw_rate = FIELD_PREP(RTW89_HW_RATE_MASK_MOD, mode) |
 			     FIELD_PREP(RTW89_HW_RATE_MASK_VAL, rate);
 	ra_report->might_fallback_legacy = mcs <= 2;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0) || defined(BUILD_OPENWRT)
 	sta->deflink.agg.max_rc_amsdu_len = get_max_amsdu_len(rtwdev, ra_report);
 	rtwsta->max_agg_wait = sta->deflink.agg.max_rc_amsdu_len / 1500 - 1;
 #else
@@ -3033,7 +3033,7 @@ void rtw89_phy_ul_tb_ctrl_check(struct rtw89_dev *rtwdev,
 	if (rtwvif->wifi_role != RTW89_WIFI_ROLE_STATION)
 		return;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0) || defined(BUILD_OPENWRT)
 	if (!vif->cfg.assoc)
 		return;
 #else
@@ -4577,7 +4577,7 @@ void rtw89_phy_set_bss_color(struct rtw89_dev *rtwdev, struct ieee80211_vif *vif
 	enum rtw89_phy_idx phy_idx = RTW89_PHY_0;
 	u8 bss_color;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 	if (!vif->bss_conf.he_support || !vif->cfg.assoc)
 #else
 	if (!vif->bss_conf.he_support || !vif->bss_conf.assoc)
@@ -4594,7 +4594,7 @@ void rtw89_phy_set_bss_color(struct rtw89_dev *rtwdev, struct ieee80211_vif *vif
 			      phy_idx);
 	rtw89_phy_write32_idx(rtwdev, chip->bss_clr_map_reg, B_BSS_CLR_MAP_TGT,
 			      bss_color, phy_idx);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 	rtw89_phy_write32_idx(rtwdev, chip->bss_clr_map_reg, B_BSS_CLR_MAP_STAID,
 			      vif->cfg.aid, phy_idx);
 #else

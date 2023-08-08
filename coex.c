@@ -5695,7 +5695,7 @@ void rtw89_btc_ntfy_role_info(struct rtw89_dev *rtwdev, struct rtw89_vif *rtwvif
 
 		rtw89_debug(rtwdev, RTW89_DBG_BTC,
 			    "[BTC], STA support HE=%d VHT=%d HT=%d\n",
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0) && !defined(BUILD_OPENWRT)
 			    sta->he_cap.has_he,
 			    sta->vht_cap.vht_supported,
 			    sta->ht_cap.ht_supported);

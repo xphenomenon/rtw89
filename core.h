@@ -4853,7 +4853,7 @@ void rtw89_chip_cfg_txpwr_ul_tb_offset(struct rtw89_dev *rtwdev,
 	struct rtw89_vif *rtwvif = (struct rtw89_vif *)vif->drv_priv;
 	const struct rtw89_chip_info *chip = rtwdev->chip;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
 	if (!vif->bss_conf.he_support || !vif->cfg.assoc)
 #else
 	if (!vif->bss_conf.he_support || !vif->bss_conf.assoc)
@@ -4974,7 +4974,7 @@ static inline u8 *get_hdr_bssid(struct ieee80211_hdr *hdr)
 
 static inline bool rtw89_sta_has_beamformer_cap(struct ieee80211_sta *sta)
 {
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0) && !defined(BUILD_OPENWRT)
 	if ((sta->vht_cap.cap & IEEE80211_VHT_CAP_MU_BEAMFORMER_CAPABLE) ||
 	    (sta->vht_cap.cap & IEEE80211_VHT_CAP_SU_BEAMFORMER_CAPABLE) ||
 	    (sta->he_cap.he_cap_elem.phy_cap_info[3] & IEEE80211_HE_PHY_CAP3_SU_BEAMFORMER) ||
